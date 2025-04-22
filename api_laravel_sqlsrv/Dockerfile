@@ -1,16 +1,20 @@
 # Usa la imagen oficial de PHP con Apache
 FROM php:8.4-apache
 
-# Instala las dependencias necesarias
+# Instala las dependencias necesarias para las extensiones
 RUN apt-get update && apt-get install -y \
     libzip-dev \
+    libpng-dev \
     unzip \
     gnupg \
-    libpng-dev \
     libjpeg62-turbo-dev \
-    libfreetype6-dev 
-    
-RUN apt-get install -y \
+    libfreetype6-dev \
+    zlib1g-dev \
+    libonig-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install mbstring zip gd
+
+    RUN apt-get install -y \
     unixodbc unixodbc-dev \
     gcc g++ make autoconf libc-dev pkg-config
 
@@ -31,6 +35,3 @@ RUN a2enmod rewrite
 
 # Instala Composer globalmente
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-# Configura la extensión zip
-RUN docker-php-ext-install zip gd
