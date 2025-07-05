@@ -11,6 +11,8 @@ RUN apt-get update && apt-get install -y \
     libfreetype6-dev \
     zlib1g-dev \
     libonig-dev \
+    nano \
+    iputils-ping \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install mbstring zip gd
 
