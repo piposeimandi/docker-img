@@ -11,9 +11,14 @@ RUN apt-get update && apt-get install -y \
     libfreetype6-dev \
     zlib1g-dev \
     libonig-dev \
+<<<<<<< HEAD
     unixodbc unixodbc-dev \
     gcc g++ make autoconf libc-dev pkg-config git wget \
     libssl-dev libxml2-dev curl libcurl4-openssl-dev \
+=======
+    nano \
+    iputils-ping \
+>>>>>>> 6a8edb28a75afb7765a75ea2dcb3634bcb7970c4
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install mbstring zip gd
 
