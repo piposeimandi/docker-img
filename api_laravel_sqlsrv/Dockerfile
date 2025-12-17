@@ -17,25 +17,28 @@ RUN apt-get update && apt-get install -y \
     nano \
     iputils-ping \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install mbstring zip gd
+    && docker-php-ext-install mbstring zip gd \
+    && rm -rf /var/lib/apt/lists/*
 
-# Agrega la clave y el repo de Microsoft para msodbcsql17
-RUN wget https://packages.microsoft.com/keys/microsoft.asc && \
-    apt-key add microsoft.asc && \
-    curl https://packages.microsoft.com/config/debian/10/prod.list > /etc/apt/sources.list.d/mssql-release.list
+# Agrega la clave y el repo de Microsoft para msodbcsql18
+RUN wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /usr/share/keyrings/microsoft-prod.gpg && \
+    echo "deb [arch=amd64,arm64,armhf signed-by=/usr/share/keyrings/microsoft-prod.gpg] https://packages.microsoft.com/debian/12/prod bookworm main" > /etc/apt/sources.list.d/mssql-release.list
 
-RUN apt-get update && ACCEPT_EULA=Y apt-get install -y msodbcsql17
+RUN apt-get update && ACCEPT_EULA=Y apt-get install -y msodbcsql18 \
+    && rm -rf /var/lib/apt/lists/*
 
 # Intenta instalar sqlsrv y pdo_sqlsrv desde PECL, si falla compila desde GitHub
 RUN pecl install sqlsrv pdo_sqlsrv \
     && docker-php-ext-enable pdo_sqlsrv sqlsrv \
+    && pecl clear-cache \
     || ( \
         git clone --depth=1 https://github.com/microsoft/msphpsql.git /tmp/msphpsql && \
         cd /tmp/msphpsql/source/sqlsrv && phpize && ./configure && make && make install && \
         cd /tmp/msphpsql/source/pdo_sqlsrv && phpize && ./configure && make && make install && \
         docker-php-ext-enable sqlsrv pdo_sqlsrv && \
         rm -rf /tmp/msphpsql \
-    )
+    ) \
+    && rm -rf /tmp/pear
 
 # Habilita los módulos de Apache necesarios
 RUN a2enmod rewrite
