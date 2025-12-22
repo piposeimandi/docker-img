@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     unzip \
     nano \
     iputils-ping \
+    git \
     libjpeg-dev \
     libpng-dev \
     libfreetype6-dev && \
