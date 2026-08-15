@@ -1,7 +1,7 @@
 # Usa la imagen oficial de PHP con Apache
 FROM php:8.4-apache
 
-# Instala las dependencias necesarias para las extensiones y compilación
+# Instala las dependencias necesarias
 RUN apt-get update && apt-get install -y \
     libzip-dev \
     libpng-dev \
@@ -18,14 +18,13 @@ RUN apt-get update && apt-get install -y \
     iputils-ping \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install mbstring zip gd \
-    && rm -rf /var/lib/apt/lists/*
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Agrega la clave y el repo de Microsoft para msodbcsql18
 RUN wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /usr/share/keyrings/microsoft-prod.gpg && \
-    echo "deb [arch=amd64,arm64,armhf signed-by=/usr/share/keyrings/microsoft-prod.gpg] https://packages.microsoft.com/debian/12/prod bookworm main" > /etc/apt/sources.list.d/mssql-release.list
-
-RUN apt-get update && ACCEPT_EULA=Y apt-get install -y msodbcsql18 \
-    && rm -rf /var/lib/apt/lists/*
+    echo "deb [arch=amd64,arm64,armhf signed-by=/usr/share/keyrings/microsoft-prod.gpg] https://packages.microsoft.com/debian/12/prod bookworm main" > /etc/apt/sources.list.d/mssql-release.list && \
+    apt-get update && ACCEPT_EULA=Y apt-get install -y msodbcsql18 \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Intenta instalar sqlsrv y pdo_sqlsrv desde PECL, si falla compila desde GitHub
 RUN pecl install sqlsrv pdo_sqlsrv \
